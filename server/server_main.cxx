@@ -50,8 +50,8 @@ void write() {
 	//std::time_t now = std::time(nullptr);
 	//data = std::ctime(&now);
 	//async_write(tcp_socket, buffer(data), write_handler);
-	//async_write(tcp_socket, buffer(a), write_handler);
-	async_write(tcp_socket, buffer(h), write_handler);
+	async_write(tcp_socket, buffer(a), write_handler);
+	//async_write(tcp_socket, buffer(h), write_handler);
 }
 
 void accept_handler(const boost::system::error_code &ec) {
@@ -61,6 +61,7 @@ void accept_handler(const boost::system::error_code &ec) {
 		data = std::ctime(&now);
 		async_write(tcp_socket, buffer(data), write_handler);*/
 		tcp_socket.async_read_some(buffer(bytes), read_handler);
+		
 	}
 }
 

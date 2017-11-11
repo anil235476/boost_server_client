@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.7)
 
 include_directories( 
-	E:/AnilDocument/Boost/
+	D:/PRogramming/boost/boost_1_64_0/boost_1_64_0
 )
 
 link_directories(
-	E:/AnilDocument/Boost/stage/lib/
+	D:/PRogramming/boost/boost_1_64_0/boost_1_64_0/stage/lib/
 )
 
 if(WIN32)
@@ -17,4 +17,5 @@ endif()
 add_executable(
 	server
 	server_main.cxx
+	server.cxx
 )
