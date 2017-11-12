@@ -13,13 +13,8 @@ if(WIN32)
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 endif()
 
-
 add_executable(
-	server
-	server_main.cxx
-	server.cxx
-	server_connection.h
-	server_connection.cxx
-	connection.hpp
-	sender_interface.h
+	client_interface
+	client_interface_main.cxx
 )
+

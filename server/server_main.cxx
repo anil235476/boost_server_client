@@ -5,6 +5,8 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <string>
 #include <ctime>
+#include "server_connection.h"
+#include <thread>
 
 using namespace boost::asio;
 using namespace boost::asio::ip;
@@ -65,8 +67,54 @@ void accept_handler(const boost::system::error_code &ec) {
 	}
 }
 
+struct header2 {
+	int width_{ 1280 };
+	int height_{ 90 };
+	bool flag_{ false };
+
+	template <typename Archive>
+	void serialize(Archive& ar, const unsigned int version)
+	{
+		ar & width_;
+		ar & height_;
+		ar & flag_;
+	}
+};
+
+class event_callback : public wow::connection_events {
+	wow::server_connection* ptr_{ nullptr };
+public:
+	event_callback(wow::server_connection * p):ptr_{p}{}
+	void add_event() override {
+		std::cout << "add  event called\n";
+		std::vector<char> data{ 'a', 'n', 'i', 'l', ' ', 'k', 'u', 'm', 'a', 'r' };
+		header2 head;
+		head.width_ = 500;
+		head.height_ = 500;
+		head.flag_ = true;
+		ptr_->send_header(head);
+		//ptr_->send_data(move(data), head);
+	}
+	void remove_event() override{}
+	bool is_done() { return false; }
+};
+
 int main() {
-	tcp_acceptor.listen();
+	/*tcp_acceptor.listen();
 	tcp_acceptor.async_accept(tcp_socket, accept_handler);
-	ioservice.run();
+	ioservice.run();*/
+	
+	wow::server_connection connection{ 2016 };
+	event_callback callbck{ &connection };
+	connection.register_callback(&callbck);
+	connection.start();
+	std::cout << "after run\n";
+	while (!callbck.is_done()) {
+		std::this_thread::sleep_for(std::chrono::seconds(5));
+		header2 head;
+		head.width_ = 500;
+		head.height_ = 500;
+		//connection.send_header(head);
+		//connection.send_data(std::vector<char>{}, head);
+	}
 }
