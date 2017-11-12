@@ -11,9 +11,7 @@ namespace wow {
 	server_connection::server_connection( int port)
 		: acceptor_(io_service_,
 			boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port))
-	{
-		
-			
+	{	
 		
 	}
 
@@ -28,10 +26,17 @@ namespace wow {
 
 	void server_connection::start() {
 		keep_listen = true;
+		//while (keep_listen) {
+		//	this->accept();
+		//	this->io_service_.run();
+		////	sender_interface_.reset(nullptr);
+		//	if (callback_)
+		//		callback_->remove_event();
+		//}
+	
 		thread_ = thread{ [this] {
 			while (this->keep_listen) {
 				this->accept();
-				//io_service_.run_one();
 				this->io_service_.run();
 			}
 		} };
@@ -63,9 +68,9 @@ namespace wow {
 		std::cout << "error code " << e;
 		if (e) {
 			std::cout << "error event\n";
-			if (callback_)
-				callback_->remove_event();
-			start();
+			/*if (callback_)
+				callback_->remove_event();*/
+			//start();
 
 		}
 			

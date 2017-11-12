@@ -92,7 +92,7 @@ public:
 		head.width_ = 500;
 		head.height_ = 500;
 		head.flag_ = true;
-		ptr_->send_header(head);
+		ptr_->send_data(move(data), head);
 		//ptr_->send_data(move(data), head);
 	}
 	void remove_event() override{}

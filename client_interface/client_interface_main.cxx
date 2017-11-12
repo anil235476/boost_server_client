@@ -43,11 +43,12 @@ struct header2 {
 	}
 };
 
-void read_array(const boost::system::error_code &ec, std::size_t bytes_transferred) {
+void read_data(const boost::system::error_code &ec, std::size_t bytes_transferred) {
+	std::cout << "data read = " << bytes_transferred << '\n';
 
 }
 
-void read_size(const boost::system::error_code &ec,
+void read_data_size(const boost::system::error_code &ec,
 	std::size_t bytes_transferred) {
 	if (!ec) {
 		std::istringstream is(std::string(inbound_header_, header_length));
@@ -61,7 +62,7 @@ void read_size(const boost::system::error_code &ec,
 		// Start an asynchronous call to receive the data.
 		inbound_data_.resize(inbound_data_size);
 		boost::asio::async_read(tcp_socket, boost::asio::buffer(inbound_data_),
-			read_array);
+			read_data);
 	}
 }
 
@@ -73,7 +74,7 @@ void read_header(const boost::system::error_code &ec, std::size_t bytes_transfer
 	header2 t;
 	archive >> t;
 	t.print();
-	boost::asio::async_read(tcp_socket, boost::asio::buffer(inbound_header_), read_size);
+	boost::asio::async_read(tcp_socket, boost::asio::buffer(inbound_header_), read_data_size);
 }
 
 void read_header_len(const boost::system::error_code &ec,

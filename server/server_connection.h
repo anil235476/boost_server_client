@@ -22,32 +22,17 @@ namespace wow {
 		void register_callback(connection_events * callback);
 		void start();
 		template<typename T>
-		bool send_header(/*std::vector<char> data,*/ const T& t) {
+		void send_data(std::vector<char>&& data, const T& t) {
 			if (sender_interface_) {
-				sender_interface_->async_write(t, boost::bind(&server_connection::handle_write, 
+				sender_interface_->async_send_struct(t, boost::bind(&server_connection::handle_write, 
 					this, boost::asio::placeholders::error)
 					);
-				/*sender_interface_->async_write(move(data),
+				sender_interface_->async_send_data(move(data),
 					boost::bind(&server_connection::handle_write,
 						this, boost::asio::placeholders::error)
-				);*/
-				//sender_interface_->send_data(move(data), t);
-				return true;
-			}
-			return false;
-		}
-
-		bool send_data(std::vector<char> data) {
-			if (sender_interface_) {
-		
-				sender_interface_->async_write(move(data),
-				boost::bind(&server_connection::handle_write,
-				this, boost::asio::placeholders::error)
 				);
-				//sender_interface_->send_data(move(data), t);
-				return true;
 			}
-			return false;
+			
 		}
 
 		void accept_handler(const boost::system::error_code &ec, std::shared_ptr<boost::asio::ip::tcp::socket>);
