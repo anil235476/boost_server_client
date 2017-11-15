@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.7)
 
 include_directories( 
-	D:/PRogramming/boost/boost_1_64_0/boost_1_64_0
+	../../../boost
+	${CMAKE_HOME_DIRECTORY}
 )
 
 link_directories(
-	D:/PRogramming/boost/boost_1_64_0/boost_1_64_0/stage/lib/
+	../../../boost/stage/lib/
 )
+
 
 if(WIN32)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
@@ -16,5 +18,8 @@ endif()
 add_executable(
 	client_interface
 	client_interface_main.cxx
+	${CMAKE_HOME_DIRECTORY}/common/struct_header.h
+	tcp_client.cpp
+	tcp_client.h
 )
 

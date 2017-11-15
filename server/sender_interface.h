@@ -10,7 +10,7 @@
 namespace internal{
 	class sender_interface {
 	public:
-		sender_interface(std::shared_ptr<boost::asio::ip::tcp::socket > socket)
+		sender_interface(boost::asio::ip::tcp::socket& socket)
 			: socket_(socket)
 		{
 		}
@@ -37,7 +37,7 @@ namespace internal{
 
 				// Something went wrong, inform the caller.
 				boost::system::error_code error(boost::asio::error::invalid_argument);
-				socket_->get_io_service().post(boost::bind(handler, error));
+				socket_.get_io_service().post(boost::bind(handler, error));
 				return;
 			}
 
@@ -47,7 +47,7 @@ namespace internal{
 			std::vector<boost::asio::const_buffer> buffers;
 			buffers.push_back(boost::asio::buffer(outbound_struct_header_));
 			buffers.push_back(boost::asio::buffer(outbound_struct_));
-			boost::asio::async_write(*socket_, buffers, handler);
+			boost::asio::async_write(socket_, buffers, handler);
 		}
 
 		template<typename Handler>
@@ -58,20 +58,19 @@ namespace internal{
 
 				// Something went wrong, inform the caller.
 				boost::system::error_code error(boost::asio::error::invalid_argument);
-				socket_->get_io_service().post(boost::bind(handler, error));
+				socket_.get_io_service().post(boost::bind(handler, error));
 				return;
 			}
 			std::vector<boost::asio::const_buffer> buffers;
 			buffers.push_back(boost::asio::buffer(outbound_data_header_));
 			buffers.push_back(boost::asio::buffer(&outbound_data_[0], outbound_data_.size()));
-			boost::asio::async_write(*socket_, buffers, handler);
+			boost::asio::async_write(socket_, buffers, handler);
 		}
 	
-
 	private:
 		/// The underlying socket.
-		std::shared_ptr<boost::asio::ip::tcp::socket > socket_;
-
+	//	std::shared_ptr<boost::asio::ip::tcp::socket > socket_;
+		boost::asio::ip::tcp::socket& socket_;
 		/// Holds an outbound header.
 		std::string outbound_struct_header_;
 		std::string outbound_data_header_;

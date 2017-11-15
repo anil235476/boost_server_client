@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.7)
 
 include_directories( 
-	D:/PRogramming/boost/boost_1_64_0/boost_1_64_0
+	../../../boost/
 )
 
 link_directories(
-	D:/PRogramming/boost/boost_1_64_0/boost_1_64_0/stage/lib/
+	../../../boost/stage/lib/
 )
 
 if(WIN32)

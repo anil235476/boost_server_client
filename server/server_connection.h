@@ -7,6 +7,9 @@
 #include "sender_interface.h"
 #include <iostream>
 #include <thread>
+#include "session.h"
+#include <mutex>
+
 
 namespace wow {
 	
@@ -19,6 +22,7 @@ namespace wow {
 	class server_connection {
 	public:
 		server_connection( int port);
+		~server_connection();
 		void register_callback(connection_events * callback);
 		void start();
 		template<typename T>
@@ -35,19 +39,26 @@ namespace wow {
 			
 		}
 
-		void accept_handler(const boost::system::error_code &ec, std::shared_ptr<boost::asio::ip::tcp::socket>);
-		/// Handle completion of a write operation.
-		void handle_write(const boost::system::error_code& e);
-		void read_handler(const boost::system::error_code &ec/*,
-			std::size_t bytes_transferred*/);
 	private:
-		bool keep_listen{ false };
+		//handler
+
+		void accept_handler(const boost::system::error_code &ec);
+		/// Handle completion of a write operation.
+		void handle_write(const boost::system::error_code& e/*,
+			std::size_t bytes_transferred*/);
+		void read_handler(const boost::system::error_code &ec,
+			std::size_t bytes_transferred);
+	private:
 		void accept();
+		void stop();
+		bool keep_listen{ false };
 		connection_events * callback_{ nullptr };
-		boost::asio::io_service io_service_;
-		/// The acceptor object used to accept incoming socket connections.
-		boost::asio::ip::tcp::acceptor acceptor_;
+		const int port_{};
+
 		std::unique_ptr<internal::sender_interface> sender_interface_;
+		std::unique_ptr<internal::session> session_;
+		std::mutex sesson_lock_;
+
 		std::thread thread_;
 	};
 

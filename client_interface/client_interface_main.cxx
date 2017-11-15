@@ -9,13 +9,15 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <array>
 #include <string>
+#include "common/struct_header.h"
+#include "tcp_client.h"
 
 using namespace boost::asio;
 using namespace boost::asio::ip;
 
-io_service ioservice;
-tcp::resolver resolv{ ioservice };
-tcp::socket tcp_socket{ ioservice };
+//io_service ioservice;
+//tcp::resolver resolv{ ioservice };
+//tcp::socket tcp_socket{ ioservice };
 std::array<char, 4096> bytes; 
 std::array<int, 4096> a{};
 constexpr int header_length{ 8 };
@@ -25,75 +27,58 @@ std::vector<char> inbound_data_;
 void write();
 
 
-struct header2 {
-	int width_{ 1280 };
-	int height_{ 90 };
-	bool flag_{ false };
-	void print() {
-		std::cout << "width = " << width_ << '\n';
-		std::cout << "height = " << height_ << '\n';
-	}
-
-	template <typename Archive>
-	void serialize(Archive& ar, const unsigned int version)
-	{
-		ar & width_;
-		ar & height_;
-		ar & flag_;
-	}
-};
-
-void read_data(const boost::system::error_code &ec, std::size_t bytes_transferred) {
-	std::cout << "data read = " << bytes_transferred << '\n';
-
-}
-
-void read_data_size(const boost::system::error_code &ec,
-	std::size_t bytes_transferred) {
-	if (!ec) {
-		std::istringstream is(std::string(inbound_header_, header_length));
-		std::size_t inbound_data_size = 0;
-		if (!(is >> std::hex >> inbound_data_size))
-		{
-			// Header doesn't seem to be valid. Inform the caller.
-			assert(false);
-		}
-
-		// Start an asynchronous call to receive the data.
-		inbound_data_.resize(inbound_data_size);
-		boost::asio::async_read(tcp_socket, boost::asio::buffer(inbound_data_),
-			read_data);
-	}
-}
-
-
-void read_header(const boost::system::error_code &ec, std::size_t bytes_transferred) {
-	std::string archive_data(&inbound_data_[0], inbound_data_.size());
-	std::istringstream archive_stream(archive_data);
-	boost::archive::text_iarchive archive(archive_stream);
-	header2 t;
-	archive >> t;
-	t.print();
-	boost::asio::async_read(tcp_socket, boost::asio::buffer(inbound_header_), read_data_size);
-}
-
-void read_header_len(const boost::system::error_code &ec,
-	std::size_t bytes_transferred) {
-	if (!ec) {
-		std::istringstream is(std::string(inbound_header_, header_length));
-		std::size_t inbound_data_size = 0;
-		if (!(is >> std::hex >> inbound_data_size))
-		{
-			// Header doesn't seem to be valid. Inform the caller.
-			assert(false);
-		}
-		std::cout << "read_header_len = " << inbound_data_size << '\n';
-		// Start an asynchronous call to receive the data.
-		inbound_data_.resize(inbound_data_size);
-		boost::asio::async_read(tcp_socket, boost::asio::buffer(inbound_data_),
-			read_header);
-	}
-}
+//void read_data(const boost::system::error_code &ec, std::size_t bytes_transferred) {
+//	std::cout << "data read = " << bytes_transferred << '\n';
+//
+//}
+//
+//void read_data_size(const boost::system::error_code &ec,
+//	std::size_t bytes_transferred) {
+//	if (!ec) {
+//		std::istringstream is(std::string(inbound_header_, header_length));
+//		std::size_t inbound_data_size = 0;
+//		if (!(is >> std::hex >> inbound_data_size))
+//		{
+//			// Header doesn't seem to be valid. Inform the caller.
+//			assert(false);
+//		}
+//
+//		// Start an asynchronous call to receive the data.
+//		inbound_data_.resize(inbound_data_size);
+//		boost::asio::async_read(tcp_socket, 
+//			boost::asio::buffer(inbound_data_),
+//			read_data);
+//	}
+//}
+//
+//void read_header(const boost::system::error_code &ec, 
+//	std::size_t bytes_transferred) {
+//	std::string archive_data(&inbound_data_[0], inbound_data_.size());
+//	std::istringstream archive_stream(archive_data);
+//	boost::archive::text_iarchive archive(archive_stream);
+//	struct_header t;
+//	archive >> t;
+//	//t.print();
+//	boost::asio::async_read(tcp_socket, boost::asio::buffer(inbound_header_), read_data_size);
+//}
+//
+//void read_header_len(const boost::system::error_code &ec,
+//	std::size_t bytes_transferred) {
+//	if (!ec) {
+//		std::istringstream is(std::string(inbound_header_, header_length));
+//		std::size_t inbound_data_size = 0;
+//		if (!(is >> std::hex >> inbound_data_size))
+//		{
+//			// Header doesn't seem to be valid. Inform the caller.
+//			assert(false);
+//		}
+//		std::cout << "read_header_len = " << inbound_data_size << '\n';
+//		// Start an asynchronous call to receive the data.
+//		inbound_data_.resize(inbound_data_size);
+//		boost::asio::async_read(tcp_socket, boost::asio::buffer(inbound_data_),
+//			read_header);
+//	}
+//}
 
 //void write_handler(const boost::system::error_code &ec,
 //	std::size_t bytes_transferred) {
@@ -130,21 +115,22 @@ void read_header_len(const boost::system::error_code &ec,
 
 
 
-void connect_handler(const boost::system::error_code &ec) {
-	if (!ec) {
-		boost::asio::async_read(tcp_socket, boost::asio::buffer(inbound_header_), read_header_len);
-		//tcp_socket.aync_(buffer(a), read_handler);
-	}
-}
-
-void resolve_handler(const boost::system::error_code &ec,
-	tcp::resolver::iterator it) {
-	if (!ec)
-		tcp_socket.async_connect(*it, connect_handler);
-}
+//void connect_handler(const boost::system::error_code &ec) {
+//	if (!ec) {
+//		boost::asio::async_read(tcp_socket, boost::asio::buffer(inbound_header_), read_header_len);
+//		//tcp_socket.aync_(buffer(a), read_handler);
+//	}
+//}
+//
+//void resolve_handler(const boost::system::error_code &ec,
+//	tcp::resolver::iterator it) {
+//	if (!ec)
+//		tcp_socket.async_connect(*it, connect_handler);
+//}
 
 int main() {
-	tcp::resolver::query q{ "127.0.0.1", "2016" };
-	resolv.async_resolve(q, resolve_handler);
-	ioservice.run();
+	//tcp::resolver::query q{ "127.0.0.1", "2016" };
+	//resolv.async_resolve(q, resolve_handler);
+	//ioservice.run();
+	wow::tcp_client client_{ 2016 };
 }
